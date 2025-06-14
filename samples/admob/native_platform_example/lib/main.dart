@@ -24,8 +24,9 @@ class NativeExampleState extends State<NativeExample> {
   final double _nativeAdHeight = Platform.isAndroid ? 320 : 300;
   var _isMobileAdsInitializeCalled = false;
   var _isPrivacyOptionsRequired = false;
-  NativeAd? _nativeAd;
+  NativeAdEx? _nativeAd;
   bool _nativeAdIsLoaded = false;
+  bool _setNativAdUI = false;
 
   final String _adUnitId = Platform.isAndroid
       ? 'ca-app-pub-3940256099942544/2247696110'
@@ -72,7 +73,7 @@ class NativeExampleState extends State<NativeExample> {
                     height: _nativeAdHeight,
                     width: MediaQuery.of(context).size.width,
                   ),
-                  if (_nativeAdIsLoaded && _nativeAd != null)
+                  if (_nativeAdIsLoaded && _nativeAd != null && _setNativAdUI)
                     SizedBox(
                       height: _nativeAdHeight,
                       width: MediaQuery.of(context).size.width,
@@ -143,9 +144,8 @@ class NativeExampleState extends State<NativeExample> {
       _nativeAdIsLoaded = false;
     });
 
-    _nativeAd = NativeAd(
+    _nativeAd = NativeAdEx(
       adUnitId: _adUnitId,
-      factoryId: 'adFactoryExample',
       listener: NativeAdListener(
         onAdLoaded: (ad) {
           // ignore: avoid_print
@@ -168,6 +168,13 @@ class NativeExampleState extends State<NativeExample> {
       ),
       request: const AdRequest(),
     )..load();
+
+    Future.delayed(const Duration(seconds: 10), () async {
+      await _nativeAd?.setNativeAdUI(factoryId: 'adFactoryExample');
+      setState(() {
+        _setNativAdUI = true;
+      });
+    });
   }
 
   /// Redraw the app bar actions if a privacy options entry point is required.
