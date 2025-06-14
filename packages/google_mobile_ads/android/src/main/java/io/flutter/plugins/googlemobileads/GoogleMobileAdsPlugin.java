@@ -435,6 +435,43 @@ public class GoogleMobileAdsPlugin implements FlutterPlugin, ActivityAware, Meth
         nativeAd.load();
         result.success(null);
         break;
+      case "loadNativeAdEx":
+        final FlutterNativeAdEx nativeAdEx =
+                new FlutterNativeAdEx.Builder(context)
+                        .setManager(instanceManager)
+                        .setAdUnitId(call.<String>argument("adUnitId"))
+                        .setRequest(call.<FlutterAdRequest>argument("request"))
+                        .setAdManagerRequest(call.<FlutterAdManagerAdRequest>argument("adManagerRequest"))
+                        .setId(call.<Integer>argument("adId"))
+                        .setNativeAdOptions(call.<FlutterNativeAdOptions>argument("nativeAdOptions"))
+                        .setFlutterAdLoader(new FlutterAdLoader(context))
+                        .build();
+        instanceManager.trackAd(nativeAdEx, call.<Integer>argument("adId"));
+        nativeAdEx.load();
+        result.success(null);
+        break;
+      case "setNativeAdUI":
+        final String factoryIdEx = call.argument("factoryId");
+        final NativeAdFactory factoryEx = nativeAdFactories.get(factoryIdEx);
+        final FlutterNativeTemplateStyle templateStyleEx = call.argument("nativeTemplateStyle");
+        if (factoryEx == null && templateStyleEx == null) {
+          final String message =
+                  String.format("No NativeAdFactory with id: %s or nativeTemplateStyle", factoryIdEx);
+          result.error("NativeAdError", message, null);
+          break;
+        }
+
+        final boolean adSetUI = instanceManager.setNativeAdUI(
+                call.<Integer>argument("adId"),
+                factoryEx,
+                call.<Map<String, Object>>argument("customOptions"),
+                templateStyleEx);
+        if (!adSetUI) {
+          result.error("NativeAdEx|AdShowError", "Ad failed to show.", null);
+          break;
+        }
+        result.success(null);
+        break;
       case "loadInterstitialAd":
         final FlutterInterstitialAd interstitial =
             new FlutterInterstitialAd(

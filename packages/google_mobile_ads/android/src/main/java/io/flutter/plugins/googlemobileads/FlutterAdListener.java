@@ -110,3 +110,19 @@ class FlutterNativeAdLoadedListener implements OnNativeAdLoadedListener {
     }
   }
 }
+
+class FlutterNativeAdExLoadedListener implements OnNativeAdLoadedListener {
+
+  private final WeakReference<FlutterNativeAdEx> nativeAdWeakReference;
+
+  FlutterNativeAdExLoadedListener(FlutterNativeAdEx flutterNativeAd) {
+    nativeAdWeakReference = new WeakReference<>(flutterNativeAd);
+  }
+
+  @Override
+  public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
+    if (nativeAdWeakReference.get() != null) {
+      nativeAdWeakReference.get().onNativeAdLoaded(nativeAd);
+    }
+  }
+}

@@ -1081,6 +1081,92 @@ class NativeAd extends AdWithView {
   }
 }
 
+/// A NativeAdEx.
+class NativeAdEx extends AdWithView {
+  /// Creates a [NativeAdEx].
+  ///
+  /// A valid [adUnitId], nonnull [listener], nonnull [request], and either
+  /// [factoryId] or [nativeTemplateStyle] is required.
+  /// Use [nativeAdOptions] to customize the native ad request.
+  /// Use [customOptions] to pass data to your native ad factory.
+  NativeAdEx({
+    required String adUnitId,
+    //this.factoryId,
+    required this.listener,
+    required this.request,
+    this.nativeAdOptions,
+    //this.customOptions,
+    //this.nativeTemplateStyle,
+  })  : adManagerRequest = null,
+        assert(request != null),
+        //assert(nativeTemplateStyle != null || factoryId != null),
+        super(adUnitId: adUnitId, listener: listener);
+
+  /// Creates a [NativeAd] with Ad Manager.
+  ///
+  /// A valid [adUnitId], nonnull [listener], nonnull [adManagerRequest], and
+  /// either [factoryId] or [nativeTemplateStyle] is required.
+  /// Use [nativeAdOptions] to customize the native ad request.
+  /// Use [customOptions] to pass data to your native ad factory.
+  NativeAdEx.fromAdManagerRequest({
+    required String adUnitId,
+    //this.factoryId,
+    required this.listener,
+    required this.adManagerRequest,
+    this.nativeAdOptions,
+    //this.customOptions,
+    //this.nativeTemplateStyle,
+  })  : request = null,
+        assert(adManagerRequest != null),
+        //assert(nativeTemplateStyle != null || factoryId != null),
+        super(adUnitId: adUnitId, listener: listener);
+
+  /// An identifier for the factory that creates the Platform view.
+  //String? factoryId;
+
+  /// A listener for receiving events in the ad lifecycle.
+  @override
+  final NativeAdListener listener;
+
+  /// Optional options used to create the [NativeAd].
+  ///
+  /// These options are passed to the platform's `NativeAdFactory`.
+  //Map<String, Object>? customOptions;
+
+  /// Targeting information used to fetch an [Ad].
+  final AdRequest? request;
+
+  /// Targeting information used to fetch an [Ad] with Ad Manager.
+  final AdManagerAdRequest? adManagerRequest;
+
+  /// Options to configure the native ad request.
+  final NativeAdOptions? nativeAdOptions;
+
+  /// Optional [NativeTemplateStyle] for this ad.
+  ///
+  /// If this is non-null, the plugin will render a native ad template
+  /// with corresponding style. Otherwise any registered NativeAdFactory will be
+  /// used to render the native ad.
+  //NativeTemplateStyle? nativeTemplateStyle;
+
+  @override
+  Future<void> load() async {
+    await instanceManager.loadNativeAdEx(this);
+  }
+
+  //show NativeAdEx
+  /// Displays NativeAdEx.
+  Future<void> setNativeAdUI({
+    String? factoryId,
+    Map<String, Object>? customOptions,
+    NativeTemplateStyle? nativeTemplateStyle,
+  }) async {
+    assert(nativeTemplateStyle != null || factoryId != null);
+    return instanceManager.setNativeAdUI(
+        this, factoryId, customOptions, nativeTemplateStyle);
+  }
+}
+
 /// A full-screen interstitial ad for the Google Mobile Ads Plugin.
 class InterstitialAd extends AdWithoutView {
   /// Creates an [InterstitialAd].

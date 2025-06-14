@@ -18,6 +18,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_mobile_ads_example/native_ex_template_example.dart';
 import 'dart:developer';
 
 import 'anchored_adaptive_example.dart';
@@ -59,6 +60,7 @@ class _MyAppState extends State<MyApp> {
   static const nativeTemplateButtonText = 'Native template';
   static const webviewExampleButtonText = 'Register WebView';
   static const adInspectorButtonText = 'Ad Inspector';
+  static const nativeExTemplateButtonText = 'NativeEx template';
 
   InterstitialAd? _interstitialAd;
   int _numInterstitialLoadAttempts = 0;
@@ -285,11 +287,11 @@ class _MyAppState extends State<MyApp> {
                             builder: (context) => NativeTemplateExample()),
                       );
                       break;
-                    case webviewExampleButtonText:
+                    case nativeExTemplateButtonText:
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => WebViewExample()),
+                            builder: (context) => NativeExTemplateExample()),
                       );
                       break;
                     case adInspectorButtonText:
@@ -339,6 +341,10 @@ class _MyAppState extends State<MyApp> {
                   PopupMenuItem<String>(
                     value: adInspectorButtonText,
                     child: Text(adInspectorButtonText),
+                  ),
+                  PopupMenuItem<String>(
+                    value: nativeExTemplateButtonText,
+                    child: Text(nativeExTemplateButtonText),
                   ),
                 ],
               ),

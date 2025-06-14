@@ -533,6 +533,48 @@ class AdInstanceManager {
     );
   }
 
+  Future<void> loadNativeAdEx(NativeAdEx ad) {
+    if (adIdFor(ad) != null) {
+      return Future<void>.value();
+    }
+
+    final int adId = _nextAdId++;
+    _loadedAds[adId] = ad;
+    return channel.invokeMethod<void>(
+      'loadNativeAdEx',
+      <dynamic, dynamic>{
+        'adId': adId,
+        'adUnitId': ad.adUnitId,
+        'request': ad.request,
+        'adManagerRequest': ad.adManagerRequest,
+        'nativeAdOptions': ad.nativeAdOptions,
+      },
+    );
+  }
+
+  /// Display an [AdWithoutView] that is overlaid on top of the application.
+  Future<void> setNativeAdUI(
+    NativeAdEx ad,
+    String? factoryId,
+    Map<String, Object>? customOptions,
+    NativeTemplateStyle? nativeTemplateStyle,
+  ) {
+    assert(
+      adIdFor(ad) != null,
+      '$Ad has not been loaded or has already been disposed.',
+    );
+
+    return channel.invokeMethod<void>(
+      'setNativeAdUI',
+      <dynamic, dynamic>{
+        'adId': adIdFor(ad),
+        'factoryId': factoryId,
+        'customOptions': customOptions,
+        'nativeTemplateStyle': nativeTemplateStyle,
+      },
+    );
+  }
+
   /// Starts loading the ad if not previously loaded.
   ///
   /// Loading also terminates if ad is already in the process of loading.

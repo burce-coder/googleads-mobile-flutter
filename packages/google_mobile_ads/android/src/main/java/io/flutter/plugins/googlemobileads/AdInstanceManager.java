@@ -24,6 +24,8 @@ import com.google.android.gms.ads.ResponseInfo;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugins.googlemobileads.FlutterAd.FlutterAdError;
 import io.flutter.plugins.googlemobileads.FlutterAd.FlutterResponseInfo;
+import io.flutter.plugins.googlemobileads.nativetemplates.FlutterNativeTemplateStyle;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -228,6 +230,19 @@ class AdInstanceManager {
     }
 
     ad.show();
+    return true;
+  }
+
+  boolean setNativeAdUI(int id,
+                         @NonNull GoogleMobileAdsPlugin.NativeAdFactory adFactory,
+                         @Nullable Map<String, Object> customOptions,
+                         @Nullable FlutterNativeTemplateStyle nativeTemplateStyle) {
+    final FlutterNativeAdEx ad = (FlutterNativeAdEx)adForId(id);
+    if(ad == null) {
+      return false;
+    }
+
+    ad.setNativeAdUI(adFactory, customOptions, nativeTemplateStyle);
     return true;
   }
 
