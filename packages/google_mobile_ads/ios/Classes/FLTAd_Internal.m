@@ -1197,6 +1197,139 @@
 
 @end
 
+#pragma mark - FLTNativeAdEx
+
+@implementation FLTNativeAdEx{
+    NSString *_adUnitId;
+    FLTAdRequest *_adRequest;
+    NSObject<FLTNativeAdFactory> *_nativeAdFactory;
+    NSDictionary<NSString *, id> *_customOptions;
+    UIView *_view;
+    GADAdLoader *_adLoader;
+    FLTNativeAdOptions *_nativeAdOptions;
+    FLTNativeTemplateStyle *_nativeTemplateStyle;
+    GADNativeAd *_nativeAd;
+  }
+
+- (instancetype _Nonnull)
+       initWithAdUnitId:(NSString *_Nonnull)adUnitId
+                request:(FLTAdRequest *_Nonnull)request
+     rootViewController:(UIViewController *_Nonnull)rootViewController
+                   adId:(NSNumber *_Nonnull)adId
+        nativeAdOptions:(FLTNativeAdOptions *_Nullable)nativeAdOptions {
+  self = [super init];
+  if (self) {
+    self.adId = adId;
+    _adUnitId = adUnitId;
+    _adRequest = request;
+    NSArray<GADAdLoaderOptions *> *adLoaderOptions =
+        (nativeAdOptions == nil || [[NSNull null] isEqual:nativeAdOptions])
+            ? @[]
+            : nativeAdOptions.asGADAdLoaderOptions;
+
+    _adLoader =
+        [[GADAdLoader alloc] initWithAdUnitID:_adUnitId
+                           rootViewController:rootViewController
+                                      adTypes:@[ GADAdLoaderAdTypeNative ]
+                                      options:adLoaderOptions];
+    _nativeAdOptions = nativeAdOptions;
+    self.adLoader.delegate = self;
+  }
+  return self;
+}
+
+- (GADAdLoader *_Nonnull)adLoader {
+  return _adLoader;
+}
+
+- (void)load {
+  GADRequest *request;
+  if ([_adRequest isKindOfClass:[FLTGAMAdRequest class]]) {
+    FLTGAMAdRequest *gamRequest = (FLTGAMAdRequest *)_adRequest;
+    request = [gamRequest asGAMRequest:_adUnitId];
+  } else {
+    request = [_adRequest asGADRequest:_adUnitId];
+  }
+
+  [self.adLoader loadRequest:request];
+}
+
+#pragma mark - FLTAdSetNativeUI
+- (void)setNativeAdUI:(NSObject<FLTNativeAdFactory> *_Nonnull)nativeAdFactory
+        customOptions:(NSDictionary<NSString *, id> *_Nullable)customOptions
+  nativeTemplateStyle:(FLTNativeTemplateStyle *_Nullable)nativeTemplateStyle {
+    _nativeAdFactory = nativeAdFactory;
+    _customOptions = customOptions;
+    _nativeTemplateStyle = nativeTemplateStyle;
+    
+    // Use Nil instead of Null to fix crash with Swift integrations.
+    NSDictionary<NSString *, id> *tmp_customOptions =
+        [[NSNull null] isEqual:_customOptions] ? nil : _customOptions;
+    if ([FLTAdUtil isNotNull:_nativeTemplateStyle]) {
+      _view = [_nativeTemplateStyle getDisplayedView:_nativeAd];
+    } else if ([FLTAdUtil isNotNull:_nativeAdFactory]) {
+      _view = [_nativeAdFactory createNativeAd:_nativeAd
+                                 customOptions:tmp_customOptions];
+    }
+}
+
+#pragma mark - GADNativeAdLoaderDelegate
+- (void)adLoader:(GADAdLoader *)adLoader
+    didReceiveNativeAd:(GADNativeAd *)nativeAd {
+    
+  _nativeAd = nativeAd;
+  nativeAd.delegate = self;
+
+  __weak FLTNativeAdEx *weakSelf = self;
+  nativeAd.paidEventHandler = ^(GADAdValue *_Nonnull value) {
+    if (weakSelf.manager == nil) {
+      return;
+    }
+    [weakSelf.manager
+        onPaidEvent:weakSelf
+              value:[[FLTAdValue alloc] initWithValue:value.value
+                                            precision:(NSInteger)value.precision
+                                         currencyCode:value.currencyCode]];
+  };
+  [manager onAdLoaded:self responseInfo:nativeAd.responseInfo];
+}
+
+- (void)adLoader:(GADAdLoader *)adLoader
+    didFailToReceiveAdWithError:(NSError *)error {
+  [manager onAdFailedToLoad:self error:error];
+}
+
+#pragma mark - GADNativeAdDelegate
+
+- (void)nativeAdDidRecordClick:(GADNativeAd *)nativeAd {
+  [manager adDidRecordClick:self];
+}
+
+- (void)nativeAdDidRecordImpression:(GADNativeAd *)nativeAd {
+  [manager onNativeAdImpression:self];
+}
+
+- (void)nativeAdWillPresentScreen:(GADNativeAd *)nativeAd {
+  [manager onNativeAdWillPresentScreen:self];
+}
+
+- (void)nativeAdWillDismissScreen:(nonnull GADNativeAd *)nativeAd {
+  [manager onNativeAdWillDismissScreen:self];
+}
+
+- (void)nativeAdDidDismissScreen:(GADNativeAd *)nativeAd {
+  [manager onNativeAdDidDismissScreen:self];
+}
+
+#pragma mark - FlutterPlatformView
+- (UIView *)view {
+  return _view;
+}
+
+@synthesize manager;
+
+@end
+
 @implementation FLTRewardItem
 - (instancetype _Nonnull)initWithAmount:(NSNumber *_Nonnull)amount
                                    type:(NSString *_Nonnull)type {

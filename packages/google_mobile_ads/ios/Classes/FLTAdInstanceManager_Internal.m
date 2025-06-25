@@ -78,6 +78,22 @@
   [ad show];
 }
 
+- (void)setNativeAdUI:(NSNumber *_Nonnull)adId
+      nativeAdFactory:(NSObject<FLTNativeAdFactory> *_Nonnull)nativeAdFactory
+        customOptions:(NSDictionary<NSString *, id> *_Nullable)customOptions
+  nativeTemplateStyle:(FLTNativeTemplateStyle *_Nullable)nativeTemplateStyle {
+    id<FLTAdSetNativeUI> ad = (id<FLTAdSetNativeUI> )[self adFor:adId];
+
+    if (!ad) {
+      NSLog(@"Can't find ad with id: %@", adId);
+      return;
+    }
+
+    [ad setNativeAdUI:nativeAdFactory
+        customOptions:customOptions
+  nativeTemplateStyle:nativeTemplateStyle];
+}
+
 - (void)onAdLoaded:(id<FLTAd> _Nonnull)ad
       responseInfo:(GADResponseInfo *_Nonnull)responseInfo {
   [_channel invokeMethod:@"onAdEvent"

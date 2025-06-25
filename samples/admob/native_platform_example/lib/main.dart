@@ -142,6 +142,7 @@ class NativeExampleState extends State<NativeExample> {
 
     setState(() {
       _nativeAdIsLoaded = false;
+      _setNativAdUI = false;
     });
 
     _nativeAd = NativeAdEx(

@@ -15,9 +15,11 @@
 #import "FLTAd_Internal.h"
 #import "FLTGoogleMobileAdsCollection_Internal.h"
 #import "FLTGoogleMobileAdsReaderWriter_Internal.h"
+#import "FLTNativeTemplateStyle.h"
 #import <GoogleMobileAds/GoogleMobileAds.h>
 
 @protocol FLTAd;
+@protocol FLTNativeAdFactory;
 @class FLTBannerAd;
 @class FLTNativeAd;
 @class FLTRewardedAd;
@@ -64,6 +66,10 @@
                                              error:(NSError *_Nonnull)error;
 - (void)onFluidAdHeightChanged:(id<FLTAd> _Nonnull)ad height:(CGFloat)height;
 - (void)disposeAllAds;
+- (void)setNativeAdUI:(NSNumber *_Nonnull)adId
+      nativeAdFactory:(NSObject<FLTNativeAdFactory> *_Nonnull)nativeAdFactory
+        customOptions:(NSDictionary<NSString *, id> *_Nullable)customOptions
+  nativeTemplateStyle:(FLTNativeTemplateStyle *_Nullable)nativeTemplateStyle;
 @end
 
 @interface FLTNewGoogleMobileAdsViewFactory

@@ -167,6 +167,12 @@
 - (void)show;
 @end
 
+@protocol FLTAdSetNativeUI
+- (void)setNativeAdUI:(NSObject<FLTNativeAdFactory> *_Nonnull)nativeAdFactory
+        customOptions:(NSDictionary<NSString *, id> *_Nullable)customOptions
+  nativeTemplateStyle:(FLTNativeTemplateStyle *_Nullable)nativeTemplateStyle;
+@end
+
 @interface FLTBaseAd : NSObject
 @property(readonly) NSNumber *_Nonnull adId;
 @end
@@ -298,6 +304,17 @@
         nativeAdOptions:(FLTNativeAdOptions *_Nullable)nativeAdOptions
     nativeTemplateStyle:(FLTNativeTemplateStyle *_Nullable)nativeTemplateStyle;
 - (GADAdLoader *_Nonnull)adLoader;
+@end
+
+@interface FLTNativeAdEx
+    : FLTBaseAd <FLTAd, FlutterPlatformView, GADNativeAdDelegate,
+                 GADNativeAdLoaderDelegate, FLTAdSetNativeUI>
+- (instancetype _Nonnull)
+       initWithAdUnitId:(NSString *_Nonnull)adUnitId
+                request:(FLTAdRequest *_Nonnull)request
+     rootViewController:(UIViewController *_Nonnull)rootViewController
+                   adId:(NSNumber *_Nonnull)adId
+        nativeAdOptions:(FLTNativeAdOptions *_Nullable)nativeAdOptions;
 @end
 
 @interface FLTRewardItem : NSObject

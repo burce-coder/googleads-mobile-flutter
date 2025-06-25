@@ -434,6 +434,44 @@
         nativeTemplateStyle:call.arguments[@"nativeTemplateStyle"]];
     [_manager loadAd:ad];
     result(nil);
+  } else if ([call.method isEqualToString:@"loadNativeAdEx"]) {
+    FLTAdRequest *request;
+    if ([FLTAdUtil isNotNull:call.arguments[@"request"]]) {
+      request = call.arguments[@"request"];
+    } else if ([FLTAdUtil isNotNull:call.arguments[@"adManagerRequest"]]) {
+      request = call.arguments[@"adManagerRequest"];
+    }
+
+    FLTNativeAdEx *ad = [[FLTNativeAdEx alloc]
+           initWithAdUnitId:call.arguments[@"adUnitId"]
+                    request:request
+         rootViewController:rootController
+                       adId:call.arguments[@"adId"]
+            nativeAdOptions:call.arguments[@"nativeAdOptions"]];
+    [_manager loadAd:ad];
+    result(nil);
+  } else if ([call.method isEqualToString:@"setNativeAdUI"]) {
+      NSString *factoryId = call.arguments[@"factoryId"];
+      id<FLTNativeAdFactory> factory = _nativeAdFactories[factoryId];
+      FLTNativeTemplateStyle *templateStyle =
+          call.arguments[@"nativeTemplateStyle"];
+      if ([FLTAdUtil isNull:factory] && [FLTAdUtil isNull:templateStyle]) {
+        NSString *message =
+            [NSString stringWithFormat:@"Can't find NativeAdFactory with id: %@ "
+                                       @"and nativeTemplateStyle is null",
+                                       factoryId];
+        result([FlutterError errorWithCode:@"NativeAdError"
+                                   message:message
+                                   details:nil]);
+        return;
+      }
+      
+      [_manager setNativeAdUI:call.arguments[@"adId"]
+              nativeAdFactory:factory
+                customOptions:call.arguments[@"customOptions"]
+          nativeTemplateStyle:templateStyle
+      ];
+      result(nil);
   } else if ([call.method isEqualToString:@"loadInterstitialAd"]) {
     FLTInterstitialAd *ad =
         [[FLTInterstitialAd alloc] initWithAdUnitId:call.arguments[@"adUnitId"]
